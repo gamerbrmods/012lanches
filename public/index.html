@@ -440,36 +440,7 @@
 
     <!-- CARRINHO E PAGAMENTO -->
     <div class="cart-payment">
-
-      
     
-    <!-- Formulário de Cartão de Crédito/Débito (inicialmente escondido) -->
-<div id="cardFormContainer" style="display: none; margin-top: 20px;">
-  <div class="payment-divider">
-    <hr> <span>Dados do Cartão</span> <hr>
-  </div>
-  
-  <form id="cardPaymentForm">
-    <div class="form-group">
-      <label><i class="fas fa-user"></i> Nome no Cartão</label>
-      <input type="text" id="cardholderName" placeholder="Como está no cartão" required>
-    </div>
-    
-    <div class="form-group">
-      <label><i class="fas fa-credit-card"></i> Número do Cartão</label>
-      <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
-    </div>
-    
-    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-      <div>
-        <label><i class="fas fa-calendar"></i> Validade (MM/AA)</label>
-        <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
-      </div>
-      <div>
-        <label><i class="fas fa-lock"></i> CVV</label>
-        <input type="text" id="cardCvv" placeholder="123" maxlength="4" required>
-      </div>
-    </div>
     
     <div class="form-group">
       <label><i class="fas fa-chart-line"></i> Parcelas</label>
@@ -509,13 +480,44 @@
         <span>Total</span>
         <span id="cartTotalValue">R$ 0,00</span>
       </div>
-
-
-      <div class="form-group">
+      
+      
+      
+      
+      
+    <!-- Formulário de Cartão de Crédito/Débito (inicialmente escondido) -->
+<div id="cardFormContainer" style="display: none; margin-top: 20px;">
+  <div class="payment-divider">
+    <hr> <span>Dados do Cartão</span> <hr>
+  </div>
+  
+  <form id="cardPaymentForm">
+    <div class="form-group">
+      <label><i class="fas fa-user"></i> Nome no Cartão</label>
+      <input type="text" id="cardholderName" placeholder="Como está no cartão" required>
+    </div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-credit-card"></i> Número do Cartão</label>
+      <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+    </div>
+    
+    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div>
+        <label><i class="fas fa-calendar"></i> Validade (MM/AA)</label>
+        <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
+      </div>
+      <div>
+        <label><i class="fas fa-lock"></i> CVV</label>
+        <input type="text" id="cardCvv" placeholder="123" maxlength="4" required>
+      </div>
+    </div>
+    
+    <div class="form-group">
   <label><i class="fas fa-id-card"></i> CPF (obrigatório para pagamento)</label>
   <input type="text" id="docNumber" placeholder="000.000.000-00" maxlength="14">
   <small style="font-size: 11px; color: #666;">Digite apenas números</small>
-      </div>
+</div>
 
       <!-- INFORMAÇÕES PARA ENTREGA -->
       <div class="form-group">
