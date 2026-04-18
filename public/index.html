@@ -5,6 +5,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <!-- SDK do Mercado Pago para transparência -->
+<script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
   <title>Lanchão Caraguá - Peça pelo WhatsApp ou Pagamento Online | Cardápio com Mercado Pago</title>
   <!-- Google Fonts + Font Awesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -438,6 +440,62 @@
 
     <!-- CARRINHO E PAGAMENTO -->
     <div class="cart-payment">
+    
+    <!-- Formulário de Cartão de Crédito/Débito (inicialmente escondido) -->
+<div id="cardFormContainer" style="display: none; margin-top: 20px;">
+  <div class="payment-divider">
+    <hr> <span>Dados do Cartão</span> <hr>
+  </div>
+  
+  <form id="cardPaymentForm">
+    <div class="form-group">
+      <label><i class="fas fa-user"></i> Nome no Cartão</label>
+      <input type="text" id="cardholderName" placeholder="Como está no cartão" required>
+    </div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-credit-card"></i> Número do Cartão</label>
+      <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+    </div>
+    
+    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div>
+        <label><i class="fas fa-calendar"></i> Validade (MM/AA)</label>
+        <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
+      </div>
+      <div>
+        <label><i class="fas fa-lock"></i> CVV</label>
+        <input type="text" id="cardCvv" placeholder="123" maxlength="4" required>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-chart-line"></i> Parcelas</label>
+      <select id="installments">
+        <option value="1">1x de R$ 0,00</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-id-card"></i> CPF do Titular</label>
+      <input type="text" id="docNumber" placeholder="000.000.000-00" maxlength="14" required>
+    </div>
+    
+    <button type="submit" class="mercadopago-btn" style="background: #25D366;">
+      <i class="fas fa-credit-card"></i> Pagar com Cartão
+    </button>
+  </form>
+</div>
+
+<!-- Container para exibir QR Code PIX -->
+<div id="pixContainer" style="display: none; margin-top: 20px; text-align: center;">
+  <div class="payment-divider">
+    <hr> <span>Pagamento PIX</span> <hr>
+  </div>
+  <div id="pixContent"></div>
+</div>
+    
+    
       <div class="cart-header">
         <h3><i class="fas fa-shopping-bag"></i> Seu Pedido</h3>
         <button class="clear-cart" id="clearCartBtn"><i class="fas fa-trash-alt"></i> Limpar</button>
@@ -718,51 +776,104 @@
     }
 
     // FUNÇÃO PAGAMENTO MERCADO PAGO
-    async function iniciarPagamentoMercadoPago() {
-  if (carrinho.length === 0) {
-    mostrarStatusTemp("Seu carrinho está vazio! Adicione itens antes de pagar.", "erro", mpStatusDiv);
-    return;
+ // Configuração do Mercado Pago
+let mp = null;
+let cardForm = null;
+
+// Inicializar Mercado Pago
+function initMercadoPago() {
+  if (!mp) {
+    mp = new MercadoPago('SUA_PUBLIC_KEY_AQUI', {
+      locale: 'pt-BR'
+    });
   }
+}
+
+// Calcular parcelas
+async function getInstallments(bin, amount) {
+  try {
+    const response = await fetch(`https://api.mercadopago.com/v1/payment_methods/installments?bin=${bin}&amount=${amount}`, {
+      headers: {
+        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+      }
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao buscar parcelas:', error);
+    return [];
+  }
+}
+
+// Atualizar opções de parcelas
+async function updateInstallments(cardNumber, amount) {
+  const bin = cardNumber.replace(/\s/g, '').substring(0, 6);
+  if (bin.length >= 6) {
+    const installmentsData = await getInstallments(bin, amount);
+    const selectInstallments = document.getElementById('installments');
+    selectInstallments.innerHTML = '';
+    
+    if (installmentsData && installmentsData.length > 0) {
+      const installmentOptions = installmentsData[0].payer_costs || [];
+      installmentOptions.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.installments;
+        optionElement.textContent = option.recommended_message || `${option.installments}x de R$ ${option.installment_amount.toFixed(2)}`;
+        selectInstallments.appendChild(optionElement);
+      });
+    } else {
+      selectInstallments.innerHTML = '<option value="1">1x de R$ ' + amount.toFixed(2) + '</option>';
+    }
+  }
+}
+
+// Mostrar formulário de cartão
+function showCardForm() {
+  document.getElementById('cardFormContainer').style.display = 'block';
+  document.getElementById('pixContainer').style.display = 'none';
   
+  // Limpar formulário
+  document.getElementById('cardNumber').value = '';
+  document.getElementById('cardholderName').value = '';
+  document.getElementById('cardExpiry').value = '';
+  document.getElementById('cardCvv').value = '';
+  document.getElementById('installments').innerHTML = '<option value="1">1x de R$ 0,00</option>';
+}
+
+// Mostrar PIX
+function showPixForm() {
+  document.getElementById('cardFormContainer').style.display = 'none';
+  document.getElementById('pixContainer').style.display = 'block';
+  document.getElementById('pixContent').innerHTML = '';
+}
+
+// Processar pagamento PIX
+async function processPixPayment() {
   const nomeCliente = customerNameInput.value.trim();
   const emailCliente = customerEmailInput.value.trim();
+  const docNumber = document.getElementById('docNumber')?.value.replace(/\D/g, '') || '12345678909';
+  const totalPedido = calcularTotal();
   
   if (!emailCliente || !emailCliente.includes('@')) {
-    mostrarStatusTemp("Informe um e-mail válido para continuar com o pagamento.", "erro", mpStatusDiv);
-    return;
+    mostrarStatusTemp("Informe um e-mail válido!", "erro", mpStatusDiv);
+    return false;
   }
   
-  const totalPedido = calcularTotal();
-  const metodoPagamento = mpPaymentMethod.value;
-  
-  // Preparar dados do pagamento direto
   const paymentData = {
-    type: metodoPagamento === 'pix' ? 'pix' : 'card',
+    type: 'pix',
     amount: totalPedido,
-    description: `Pedido Lanchão Caraguá - ${customerNameInput.value}`,
+    description: `Pedido Lanchão Caraguá - ${nomeCliente}`,
     payer: {
       email: emailCliente,
       first_name: nomeCliente.split(' ')[0],
-      last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Cliente',
-      identification: {
-        type: 'CPF',
-        number: '12345678909' // Idealmente você pediria isso ao usuário
-      }
+      last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Cliente'
     },
-    paymentMethodId: metodoPagamento === 'credit_card' ? 'visa' : 
-                     metodoPagamento === 'debit_card' ? 'debit_card' : 
-                     metodoPagamento === 'ticket' ? 'bolbradesco' : 'pix'
+    docNumber: docNumber,
+    paymentMethodId: 'pix'
   };
   
-  // Para cartão de crédito, você precisaria de um token (gerado pelo frontend do MP)
-  if (metodoPagamento === 'credit_card' || metodoPagamento === 'debit_card') {
-    // Você precisaria integrar o CardForm do Mercado Pago
-    mostrarStatusTemp("Pagamento com cartão requer integração adicional com o CardForm do Mercado Pago", "erro", mpStatusDiv);
-    return;
-  }
-  
   try {
-    mpStatusDiv.innerHTML = '<span style="color:#0079c1;"><i class="fas fa-spinner fa-pulse"></i> Processando pagamento...</span>';
+    mpStatusDiv.innerHTML = '<span style="color:#0079c1;"><i class="fas fa-spinner fa-pulse"></i> Gerando PIX, aguarde...</span>';
     
     const response = await fetch('/.netlify/functions/create-payment', {
       method: 'POST',
@@ -772,37 +883,216 @@
     
     const data = await response.json();
     
-    if (data.status === 'approved' || data.status === 'pending') {
-      if (data.qr_code) {
-        // Exibir QR Code para Pix
-        mpStatusDiv.innerHTML = `
-          <div style="text-align: center;">
-            <p>✅ Pagamento gerado com sucesso!</p>
-            <img src="${data.qr_code_base64}" alt="QR Code Pix" style="max-width: 200px; margin: 10px auto;">
-            <p>Escaneie o QR Code para pagar</p>
-            <button onclick="copiarPix('${data.qr_code}')" class="mercadopago-btn" style="margin-top: 10px;">
-              Copiar código Pix
-            </button>
+    if (data.status === 'pending' && data.qr_code) {
+      document.getElementById('pixContent').innerHTML = `
+        <div style="text-align: center;">
+          <i class="fas fa-check-circle" style="color: #25D366; font-size: 48px;"></i>
+          <p style="margin: 10px 0; font-weight: bold;">✅ PIX gerado com sucesso!</p>
+          ${data.qr_code_base64 ? `<img src="${data.qr_code_base64}" alt="QR Code PIX" style="max-width: 250px; margin: 15px auto; border: 2px solid #ddd; border-radius: 10px; padding: 10px;">` : ''}
+          <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin: 15px 0; word-break: break-all;">
+            <p style="font-size: 12px; color: #666;">Código PIX copiável:</p>
+            <code style="font-size: 11px;">${data.qr_code}</code>
           </div>
-        `;
-      } else if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        mostrarStatusTemp(`Pagamento ${data.status}: ${data.status_detail}`, "sucesso", mpStatusDiv);
-      }
+          <button onclick="copiarPix('${data.qr_code}')" class="mercadopago-btn" style="background: #25D366; margin: 5px;">
+            <i class="fas fa-copy"></i> Copiar código PIX
+          </button>
+          <button onclick="verificarPagamento('${data.payment_id}')" class="mercadopago-btn" style="background: #0079c1; margin: 5px;">
+            <i class="fas fa-sync-alt"></i> Já paguei, verificar
+          </button>
+          <p style="font-size: 12px; margin-top: 15px; color: #666;">
+            <i class="fas fa-clock"></i> O pagamento será confirmado em alguns segundos
+          </p>
+        </div>
+      `;
+      mostrarStatusTemp("PIX gerado! Escaneie o QR Code ou copie o código.", "sucesso", mpStatusDiv);
+      return true;
     } else {
-      throw new Error(`Pagamento não aprovado: ${data.status}`);
+      throw new Error('Erro ao gerar PIX');
     }
   } catch (error) {
     console.error(error);
-    mostrarStatusTemp("Erro no pagamento: " + error.message, "erro", mpStatusDiv);
+    mostrarStatusTemp("Erro ao gerar PIX: " + error.message, "erro", mpStatusDiv);
+    return false;
   }
 }
 
-// Função auxiliar para copiar código Pix
+// Processar pagamento com cartão
+async function processCardPayment(event) {
+  event.preventDefault();
+  
+  const nomeCliente = customerNameInput.value.trim();
+  const emailCliente = customerEmailInput.value.trim();
+  const totalPedido = calcularTotal();
+  const cardholderName = document.getElementById('cardholderName').value.trim();
+  const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+  const cardExpiry = document.getElementById('cardExpiry').value;
+  const cardCvv = document.getElementById('cardCvv').value;
+  const installments = document.getElementById('installments').value;
+  const docNumber = document.getElementById('docNumber').value.replace(/\D/g, '');
+  
+  // Validações
+  if (!cardholderName || !cardNumber || !cardExpiry || !cardCvv || !docNumber) {
+    mostrarStatusTemp("Preencha todos os dados do cartão!", "erro", mpStatusDiv);
+    return;
+  }
+  
+  if (docNumber.length !== 11) {
+    mostrarStatusTemp("CPF inválido! Digite 11 números.", "erro", mpStatusDiv);
+    return;
+  }
+  
+  try {
+    mpStatusDiv.innerHTML = '<span style="color:#0079c1;"><i class="fas fa-spinner fa-pulse"></i> Processando pagamento...</span>';
+    
+    // Gerar token do cartão
+    const [month, year] = cardExpiry.split('/');
+    
+    const cardToken = await mp.card.createToken({
+      cardNumber: cardNumber,
+      cardholderName: cardholderName,
+      cardExpirationMonth: month,
+      cardExpirationYear: '20' + year,
+      securityCode: cardCvv,
+      identificationType: 'CPF',
+      identificationNumber: docNumber
+    });
+    
+    const paymentData = {
+      type: 'card',
+      amount: totalPedido,
+      description: `Pedido Lanchão Caraguá - ${nomeCliente}`,
+      payer: {
+        email: emailCliente,
+        first_name: nomeCliente.split(' ')[0],
+        last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Cliente'
+      },
+      token: cardToken.id,
+      installments: parseInt(installments),
+      paymentMethodId: 'visa', // Pode ser dinâmico baseado no BIN
+      docNumber: docNumber,
+      cardholderName: cardholderName
+    };
+    
+    const response = await fetch('/.netlify/functions/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(paymentData)
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'approved') {
+      mostrarStatusTemp("✅ Pagamento aprovado com sucesso!", "sucesso", mpStatusDiv);
+      setTimeout(() => {
+        // Limpar carrinho e redirecionar para página de sucesso
+        carrinho = [];
+        atualizarCarrinhoUI();
+        alert("Pagamento aprovado! Seu pedido será preparado.");
+      }, 2000);
+    } else if (data.status === 'pending') {
+      mostrarStatusTemp("⏳ Pagamento pendente de confirmação", "info", mpStatusDiv);
+    } else {
+      throw new Error(`Pagamento ${data.status}: ${data.status_detail || 'Erro desconhecido'}`);
+    }
+  } catch (error) {
+    console.error(error);
+    mostrarStatusTemp("Erro no pagamento: " + (error.message || error), "erro", mpStatusDiv);
+  }
+}
+
+// Verificar status do pagamento
+async function verificarPagamento(paymentId) {
+  try {
+    mostrarStatusTemp("Verificando pagamento...", "info", mpStatusDiv);
+    const response = await fetch(`/.netlify/functions/check-payment?id=${paymentId}`);
+    const data = await response.json();
+    
+    if (data.status === 'approved') {
+      mostrarStatusTemp("✅ Pagamento confirmado! Pedido recebido.", "sucesso", mpStatusDiv);
+      setTimeout(() => {
+        carrinho = [];
+        atualizarCarrinhoUI();
+        document.getElementById('pixContainer').style.display = 'none';
+      }, 2000);
+    } else {
+      mostrarStatusTemp(`Pagamento ainda ${data.status}. Aguarde ou entre em contato.`, "info", mpStatusDiv);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Função principal que decide qual método de pagamento usar
+async function iniciarPagamentoMercadoPago() {
+  if (carrinho.length === 0) {
+    mostrarStatusTemp("Seu carrinho está vazio!", "erro", mpStatusDiv);
+    return;
+  }
+  
+  const metodoPagamento = mpPaymentMethod.value;
+  
+  // Inicializar Mercado Pago se necessário
+  initMercadoPago();
+  
+  if (metodoPagamento === 'pix') {
+    showPixForm();
+    await processPixPayment();
+  } else if (metodoPagamento === 'credit_card' || metodoPagamento === 'debit_card') {
+    showCardForm();
+    mostrarStatusTemp("Preencha os dados do cartão abaixo", "info", mpStatusDiv);
+  } else {
+    mostrarStatusTemp("Método de pagamento não suportado", "erro", mpStatusDiv);
+  }
+}
+
+// Eventos para o formulário de cartão
+document.getElementById('cardNumber')?.addEventListener('input', async function(e) {
+  let value = e.target.value.replace(/\s/g, '');
+  if (value.length > 16) value = value.slice(0, 16);
+  value = value.replace(/(\d{4})/g, '$1 ').trim();
+  e.target.value = value;
+  
+  if (value.replace(/\s/g, '').length >= 6) {
+    await updateInstallments(value, calcularTotal());
+  }
+});
+
+document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+  }
+  e.target.value = value;
+});
+
+document.getElementById('cardCvv')?.addEventListener('input', function(e) {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+});
+
+document.getElementById('docNumber')?.addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, '');
+  if (value.length > 11) value = value.slice(0, 11);
+  if (value.length <= 11) {
+    if (value.length <= 3) {
+      value = value.replace(/(\d{3})/, '$1');
+    } else if (value.length <= 6) {
+      value = value.replace(/(\d{3})(\d{3})/, '$1.$2');
+    } else if (value.length <= 9) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+    } else {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    e.target.value = value;
+  }
+});
+
+// Adicionar evento de submit do formulário de cartão
+document.getElementById('cardPaymentForm')?.addEventListener('submit', processCardPayment);
+
+// Função auxiliar para copiar PIX
 function copiarPix(codigo) {
   navigator.clipboard.writeText(codigo);
-  mostrarStatusTemp("Código Pix copiado!", "sucesso", mpStatusDiv);
+  mostrarStatusTemp("✅ Código PIX copiado!", "sucesso", mpStatusDiv);
 }
     // ENVIAR PEDIDO WHATSAPP (mantido)
     function enviarPedidoWhatsApp() {
