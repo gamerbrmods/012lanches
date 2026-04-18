@@ -851,11 +851,22 @@ function showPixForm() {
 async function processPixPayment() {
   const nomeCliente = customerNameInput.value.trim();
   const emailCliente = customerEmailInput.value.trim();
-  const docNumber = document.getElementById('docNumber')?.value.replace(/\D/g, '') || '12345678909';
   const totalPedido = calcularTotal();
+  
+  // Pegar CPF do input ou usar um padrão
+  let docNumber = document.getElementById('docNumber')?.value.replace(/\D/g, '');
+  if (!docNumber || docNumber.length !== 11) {
+    docNumber = '12345678909'; // CPF padrão para teste
+    console.log('Usando CPF padrão para teste');
+  }
   
   if (!emailCliente || !emailCliente.includes('@')) {
     mostrarStatusTemp("Informe um e-mail válido!", "erro", mpStatusDiv);
+    return false;
+  }
+  
+  if (carrinho.length === 0) {
+    mostrarStatusTemp("Carrinho vazio!", "erro", mpStatusDiv);
     return false;
   }
   
@@ -865,12 +876,14 @@ async function processPixPayment() {
     description: `Pedido Lanchão Caraguá - ${nomeCliente}`,
     payer: {
       email: emailCliente,
-      first_name: nomeCliente.split(' ')[0],
-      last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Cliente'
+      first_name: nomeCliente.split(' ')[0] || 'Cliente',
+      last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Silva'
     },
     docNumber: docNumber,
     paymentMethodId: 'pix'
   };
+  
+  console.log('Enviando requisição PIX:', paymentData);
   
   try {
     mpStatusDiv.innerHTML = '<span style="color:#0079c1;"><i class="fas fa-spinner fa-pulse"></i> Gerando PIX, aguarde...</span>';
@@ -882,36 +895,57 @@ async function processPixPayment() {
     });
     
     const data = await response.json();
+    console.log('Resposta do servidor:', data);
     
-    if (data.status === 'pending' && data.qr_code) {
-      document.getElementById('pixContent').innerHTML = `
+    if (response.status !== 201) {
+      throw new Error(data.error || data.cause || 'Erro ao gerar PIX');
+    }
+    
+    if ((data.status === 'pending' || data.status === 'in_process') && data.qr_code) {
+      // Exibir QR Code com sucesso
+      const pixContent = document.getElementById('pixContent');
+      pixContent.innerHTML = `
         <div style="text-align: center;">
           <i class="fas fa-check-circle" style="color: #25D366; font-size: 48px;"></i>
-          <p style="margin: 10px 0; font-weight: bold;">✅ PIX gerado com sucesso!</p>
-          ${data.qr_code_base64 ? `<img src="${data.qr_code_base64}" alt="QR Code PIX" style="max-width: 250px; margin: 15px auto; border: 2px solid #ddd; border-radius: 10px; padding: 10px;">` : ''}
+          <p style="margin: 10px 0; font-weight: bold; color: #2c241a;">✅ PIX gerado com sucesso!</p>
+          <p style="font-size: 14px; color: #666;">Valor: <strong>R$ ${data.transaction_amount?.toFixed(2) || totalPedido.toFixed(2)}</strong></p>
+          
+          ${data.qr_code_base64 ? `
+            <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px auto; display: inline-block;">
+              <img src="${data.qr_code_base64}" alt="QR Code PIX" style="max-width: 200px; height: auto;">
+            </div>
+          ` : ''}
+          
           <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin: 15px 0; word-break: break-all;">
-            <p style="font-size: 12px; color: #666;">Código PIX copiável:</p>
-            <code style="font-size: 11px;">${data.qr_code}</code>
+            <p style="font-size: 12px; color: #666; margin-bottom: 8px;">📋 Código PIX copiável:</p>
+            <code style="font-size: 11px; background: #fff; padding: 8px; display: block; border-radius: 5px;">${data.qr_code}</code>
           </div>
-          <button onclick="copiarPix('${data.qr_code}')" class="mercadopago-btn" style="background: #25D366; margin: 5px;">
-            <i class="fas fa-copy"></i> Copiar código PIX
-          </button>
-          <button onclick="verificarPagamento('${data.payment_id}')" class="mercadopago-btn" style="background: #0079c1; margin: 5px;">
-            <i class="fas fa-sync-alt"></i> Já paguei, verificar
-          </button>
-          <p style="font-size: 12px; margin-top: 15px; color: #666;">
+          
+          <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+            <button onclick="copiarPix('${data.qr_code}')" class="mercadopago-btn" style="background: #25D366; margin: 0;">
+              <i class="fas fa-copy"></i> Copiar código
+            </button>
+            <button onclick="verificarPagamento('${data.payment_id}')" class="mercadopago-btn" style="background: #0079c1; margin: 0;">
+              <i class="fas fa-sync-alt"></i> Verificar pagamento
+            </button>
+          </div>
+          
+          <p style="font-size: 12px; margin-top: 20px; color: #666;">
             <i class="fas fa-clock"></i> O pagamento será confirmado em alguns segundos
           </p>
         </div>
       `;
-      mostrarStatusTemp("PIX gerado! Escaneie o QR Code ou copie o código.", "sucesso", mpStatusDiv);
+      
+      document.getElementById('pixContainer').style.display = 'block';
+      mostrarStatusTemp("✅ PIX gerado! Escaneie o QR Code ou copie o código.", "sucesso", mpStatusDiv);
       return true;
     } else {
-      throw new Error('Erro ao gerar PIX');
+      console.error('Resposta inesperada:', data);
+      throw new Error(`Erro ao gerar PIX: ${data.status || 'Resposta inválida'}`);
     }
   } catch (error) {
-    console.error(error);
-    mostrarStatusTemp("Erro ao gerar PIX: " + error.message, "erro", mpStatusDiv);
+    console.error('Erro detalhado no PIX:', error);
+    mostrarStatusTemp("❌ Erro ao gerar PIX: " + error.message, "erro", mpStatusDiv);
     return false;
   }
 }
@@ -1146,4 +1180,3 @@ function copiarPix(codigo) {
     </script>
 </body>
 </html>
-
