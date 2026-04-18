@@ -553,9 +553,8 @@
     const mpPaymentMethod = document.getElementById('mpPaymentMethod');
 
     const NUMERO_WHATSAPP = "5514997026250";
-    // ENDPOINT DO BACKEND PARA MERCADO PAGO (VOCÊ DEVE SUBSTITUIR PELA URL DO SEU SERVIDOR)
-    // Exemplo: "https://seudominio.com/api/create-preference" ou "http://localhost:3000/create-preference"
-    const MP_BACKEND_URL = "http://localhost:3000/create-preference";  // <-- ALTERE PARA SEU BACKEND REAL
+    const MP_BACKEND_URL = "/.netlify/functions/create-preference";
+
 
     // Renderizar cardápio
     function renderCardapio() {
