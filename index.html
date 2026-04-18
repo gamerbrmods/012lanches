@@ -1,242 +1,906 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lanchão Caraguá | Premium Delivery</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Lanch茫o Caragu谩 - Pe莽a pelo WhatsApp ou Pagamento Online | Card谩pio com Mercado Pago</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    :root {
-      --primary: #e63946;
-      --secondary: #1d3557;
-      --bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-muted: #6c757d;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    html { scroll-behavior: smooth; }
-    body { background-color: var(--bg); color: var(--secondary); line-height: 1.6; overflow-x: hidden; }
-
-    .header { 
-        background: var(--primary); 
-        color: white; 
-        padding: 4rem 2rem 3rem; 
-        text-align: center; 
-        border-bottom-left-radius: 40px; 
-        border-bottom-right-radius: 40px; 
-        margin-bottom: 2rem; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        position: relative;
+    body {
+      background: #fefaf5;
+      color: #2c241a;
     }
 
-    .top-bar {
-        position: absolute; top: 20px; right: 30px;
-        display: flex; align-items: center; gap: 10px;
-        cursor: pointer; background: rgba(255,255,255,0.2);
-        padding: 8px 15px; border-radius: 30px;
-        transition: 0.3s; border: 1px solid rgba(255,255,255,0.3);
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .badge-local {
+      background: rgba(255,255,240,0.2);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .badge-local i {
+      margin-right: 6px;
     }
 
-    .container { max-width: 1100px; margin: auto; display: grid; grid-template-columns: 1fr 380px; gap: 2rem; padding: 0 20px 40px; }
+    /* container principal */
+    .main-container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
 
-    #mini-mapa { position: fixed; bottom: 20px; left: 20px; width: 250px; height: 200px; border-radius: 20px; border: 3px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 900; overflow: hidden; }
+    /* Se莽茫o card谩pio online */
+    .products-section {
+      flex: 2;
+      min-width: 260px;
+    }
+    .menu-header {
+      margin-bottom: 2rem;
+    }
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #d13f1f, #b94424);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    .menu-sub {
+      color: #7f6b5c;
+      border-left: 3px solid #d13f1f;
+      padding-left: 1rem;
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+    .category-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 1.8rem 0 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #ffddd0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .category-title i {
+      color: #d13f1f;
+      font-size: 1.3rem;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.8rem;
+    }
+    .product-card {
+      background: white;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+      border: 1px solid #ffe0cc;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 30px rgba(0,0,0,0.1);
+    }
+    .product-img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      background: #f7e3d4;
+    }
+    .product-info {
+      padding: 1rem 1rem 1.2rem;
+    }
+    .product-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+    .product-desc {
+      font-size: 0.8rem;
+      color: #7f6b5c;
+      margin-bottom: 0.8rem;
+    }
+    .price-add {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .product-price {
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #c2410c;
+    }
+    .add-to-cart {
+      background: #d13f1f;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+    .add-to-cart:hover {
+      background: #a83112;
+      transform: scale(1.02);
+    }
 
-    .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-    .produto-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; transition: transform 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; flex-direction: column; }
-    .produto-card:hover { transform: translateY(-5px); }
-    .produto-img { width: 100%; height: 180px; object-fit: cover; }
-    .produto-info { padding: 1.2rem; flex-grow: 1; display: flex; flex-direction: column; }
-    .produto-preco { color: var(--primary); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; display: block; }
-    
-    .btn-add { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; }
-
-    .checkout-side { background: white; border-radius: 25px; padding: 1.5rem; position: sticky; top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: fit-content; border: 2px solid var(--primary); }
-    .total-box { font-size: 1.4rem; font-weight: 700; text-align: center; margin: 1.5rem 0; padding: 15px; background: #fff5f5; border-radius: 15px; color: var(--primary); border: 1px dashed var(--primary); }
-
-    .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
-    .tab { flex: 1; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; background: #eee; font-weight: 600; }
-    .tab.active { background: var(--secondary); color: white; }
-
-    input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1.5px solid #eee; border-radius: 10px; outline: none; }
-    .btn-finalizar { width: 100%; background: #27ae60; color: white; border: none; padding: 15px; border-radius: 15px; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
-
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal-content { background: white; padding: 2.5rem; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; position: relative; }
-
-    .footer { background: var(--secondary); color: white; padding: 4rem 1rem 2rem; text-align: center; margin-top: 50px; }
-    
-    @media (max-width: 850px) { 
-      .container { grid-template-columns: 1fr; }
-      #mini-mapa { width: 150px; height: 150px; }
+    /* CARRINHO + FINALIZAR */
+    .cart-payment {
+      flex: 1.2;
+      min-width: 320px;
+      background: white;
+      border-radius: 28px;
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+      border: 1px solid #ffe0cc;
+      height: fit-content;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid #f1e2d6;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .cart-header h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .clear-cart {
+      background: none;
+      border: none;
+      color: #b95a3a;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.8rem;
+    }
+    .cart-items {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding-right: 4px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #f5e4da;
+    }
+    .cart-item-info {
+      flex: 2;
+    }
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .cart-item-price {
+      font-size: 0.75rem;
+      color: #9b7a64;
+    }
+    .cart-item-qty {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3ec;
+      padding: 4px 8px;
+      border-radius: 40px;
+    }
+    .qty-btn {
+      background: white;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #c2410c;
+      font-size: 1rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .cart-item-subtotal {
+      font-weight: 700;
+      font-size: 0.9rem;
+      min-width: 65px;
+      text-align: right;
+    }
+    .remove-item {
+      background: none;
+      border: none;
+      color: #b85c3a;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 1.3rem;
+      border-top: 2px dashed #f1d9cd;
+      padding-top: 1rem;
+      margin: 0.5rem 0 1.2rem;
+    }
+    /* Se莽茫o WhatsApp */
+    .whatsapp-info {
+      background: #e9f7ef;
+      border-radius: 24px;
+      padding: 0.8rem 1rem 0.9rem;
+      margin: 0.5rem 0 1rem;
+      text-align: center;
+      border-left: 5px solid #25D366;
+    }
+    .whatsapp-number {
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: #fff;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 50px;
+      color: #128C7E;
+    }
+    /* DIVISOR entre formas de pagamento */
+    .payment-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 1rem 0 0.8rem;
+      color: #b28b72;
+      font-size: 0.7rem;
+    }
+    .payment-divider hr {
+      flex: 1;
+      border: none;
+      height: 1px;
+      background: #f0dbcf;
+    }
+    .mercadopago-btn {
+      background: linear-gradient(135deg, #009ee3, #0079c1);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mercadopago-btn:hover {
+      background: linear-gradient(135deg, #0079c1, #005f99);
+      transform: scale(1.01);
+    }
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #5a3f2e;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1.5px solid #f0dbcf;
+      background: #fffdfb;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #25D366;
+      box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
+    }
+    .whatsapp-btn {
+      background: #25D366;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .whatsapp-btn:hover {
+      background: #128C7E;
+    }
+    .status-msg {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px;
+      border-radius: 40px;
+    }
+    .empty-cart-msg {
+      text-align: center;
+      color: #b28b72;
+      padding: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+    footer {
+      background: #2c241a;
+      color: #e2cfc0;
+      text-align: center;
+      padding: 1.8rem;
+      margin-top: 3rem;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+      }
+      .cart-payment {
+        position: static;
+      }
+    }
+    i {
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-
-<header class="header">
-  <div class="top-bar" onclick="showAuth('login')">
-    <i class="fas fa-user-circle"></i>
-    <span>Minha Conta</span>
-  </div>
-  <h1>🍔 Lanchão Caraguá</h1>
-  <p>O melhor sabor do litoral direto na sua mesa</p>
-</header>
-
-<div class="container">
-  <div class="cardapio">
-    <div class="grid-produtos" id="menu-produtos"></div>
-  </div>
-
-  <div class="checkout-side" id="area-pagamento">
-    <h3>🛒 Seu Pedido</h3>
-    <div id="lista-carrinho"><p style="text-align:center;color:#888;padding:20px;">Carrinho vazio</p></div>
-    <div class="total-box" id="total-display">R$ 0,00</div>
-
-    <div id="dados-cliente">
-      <input type="text" id="nome-cliente" placeholder="Nome Completo">
-      <input type="email" id="email-cliente" placeholder="E-mail para recibo">
-      <input type="text" id="tel-cliente" placeholder="WhatsApp / Telefone">
-      <input type="text" id="end-cliente" placeholder="Endereço de Entrega">
-    </div>
-
-    <div class="tabs">
-      <div id="tab-pix" class="tab active" onclick="setMetodo('pix')">PIX</div>
-      <div id="tab-card" class="tab" onclick="setMetodo('card')">Cartão</div>
-    </div>
-
-    <div id="area-pix" style="text-align:center; display:none;">
-       <div id="qr-code-view" style="background:#f8f9fa; padding:10px; border-radius:10px; margin-bottom:10px;"></div>
-       <input type="text" id="pix-copy" readonly style="font-size:0.7rem; text-align:center;">
-    </div>
-
-    <div id="area-cartao" style="display:none;">
-      <input type="text" id="cardNumber" placeholder="Número do Cartão">
-      <input type="text" id="docNumber" placeholder="CPF do Titular">
-    </div>
-
-    <button class="btn-finalizar" id="pagarBtn">Confirmar e Pagar</button>
-    <div id="status" style="margin-top:15px; text-align:center; font-weight:600;"></div>
-  </div>
-</div>
-
-<div id="mini-mapa"></div>
-
-<footer class="footer">
-  <p>© 2026 Lanchão Caraguá - Centro, Caraguatatuba - SP</p>
-</footer>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  // --- 1. CONFIGURAÇÃO DO MAPA (LOJA FIXA) ---
-  const map = L.map('mini-mapa', { 
-    zoomControl: false, attributionControl: false 
-  }).setView([-23.6226, -45.4124], 16);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  
-  const lojaIcon = L.divIcon({ 
-    html: `<div style="background: #e63946; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
-             <i class="fas fa-utensils" style="color: white; transform: rotate(45deg); font-size: 14px;"></i>
-           </div>`, 
-    className: 'dummy', iconSize: [32, 32], iconAnchor: [16, 32]
-  });
-  
-  
-  
-  L.marker([-23.6226, -45.4124], {icon: lojaIcon}).addTo(map)
-
-    
-  // --- 2. DADOS E CARRINHO ---
-  const produtos = [
-    { id: 1, nome: "X-Salada Especial", preco: 25.0, desc: "Blend bovino 150g, queijo, alface e tomate.", img: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=500" },
-    { id: 2, nome: "Cheddar Bacon", preco: 32.9, desc: "Muito bacon crocante e cheddar cremoso.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500" },
-    { id: 3, nome: "Batata Suprema", preco: 18.0, desc: "Batatas rústicas com queijo e bacon.", img: "https://imagens.imirante.com.br/imagens/noticias/2024/04/07/kRzVAJoNICHti4nHq0VPYtK5tBWjWOzuOgYOmJNc.jpg?w=500" },
-    { id: 4, nome: "Milkshake Oreo", preco: 15.0, desc: "Sorvete premium e pedaços de Oreo.", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500" },
-    { id: 5, nome: "Coca Cola 2L", preco: 12.0, desc: "Gelada e refrescante.", img: "https://i5.walmartimages.com/asr/ecd01808-b785-4eaf-830d-81465657fa97.ed8ff2135314831c1c115a83cce1fcde.jpeg?w=500" }
-  ];
-
-  let carrinho = [];
-  let metodo = 'pix';
-
-  function renderMenu() {
-    document.getElementById('menu-produtos').innerHTML = produtos.map(p => `
-      <div class="produto-card">
-        <img src="${p.img}" class="produto-img">
-        <div class="produto-info">
-          <h4>${p.nome}</h4>
-          <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">${p.desc}</p>
-          <span class="produto-preco">R$ ${p.preco.toFixed(2)}</span>
-          <button class="btn-add" onclick="addCarrinho(${p.id})">Adicionar</button>
-        </div>
+  <div class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h1><i class="fab fa-whatsapp"></i> Lanch茫o Caragu谩</h1>
+        <p><i class="fas fa-map-marker-alt"></i> Caraguatatuba - Centro, Praia e Regi茫o</p>
       </div>
-    `).join('');
-  }
+      <div class="badge-local">
+        <i class="fab fa-whatsapp"></i> Pe莽a pelo WhatsApp | Pagamento Online com Mercado Pago
+      </div>
+    </div>
+  </div>
 
-  function addCarrinho(id) {
-    const item = produtos.find(p => p.id === id);
-    const jaTem = carrinho.find(c => c.id === id);
-    if(jaTem) jaTem.qtd++; else carrinho.push({...item, qtd: 1});
-    atualizarCarrinho();
-  }
+  <div class="main-container">
+    <!-- CARD脕PIO ONLINE -->
+    <div class="products-section">
+      <div class="menu-header">
+        <div class="section-title"><i class="fas fa-scroll"></i> Card谩pio Online</div>
+        <div class="menu-sub">Escolha seus lanches favoritos, adicione ao carrinho e finalize o pedido via WhatsApp ou pague online com Mercado Pago (Pix, cart茫o, boleto).</div>
+      </div>
+      <div id="categories-container"></div>
+    </div>
 
-  function atualizarCarrinho() {
-    const lista = document.getElementById('lista-carrinho');
-    const totalDisplay = document.getElementById('total-display');
-    if(carrinho.length === 0) {
-      lista.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">Carrinho vazio</p>';
-      totalDisplay.innerText = "R$ 0,00";
-      return;
-    }
-    let total = 0;
-    lista.innerHTML = carrinho.map(i => {
-      total += i.preco * i.qtd;
-      return `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.qtd}x ${i.nome}</span><strong>R$ ${(i.preco*i.qtd).toFixed(2)}</strong></div>`;
-    }).join('');
-    totalDisplay.innerText = `R$ ${total.toFixed(2)}`;
-  }
+    <!-- CARRINHO E PAGAMENTO -->
+    <div class="cart-payment">
+      <div class="cart-header">
+        <h3><i class="fas fa-shopping-bag"></i> Seu Pedido</h3>
+        <button class="clear-cart" id="clearCartBtn"><i class="fas fa-trash-alt"></i> Limpar</button>
+      </div>
+      <div id="cartItemsContainer" class="cart-items">
+        <div class="empty-cart-msg">Seu carrinho est谩 vazio 馃崝<br>Adicione deliciosos lanches do card谩pio!</div>
+      </div>
+      <div id="cartTotalContainer" class="cart-total">
+        <span>Total</span>
+        <span id="cartTotalValue">R$ 0,00</span>
+      </div>
 
-  function setMetodo(m) {
-    metodo = m;
-    document.getElementById('tab-pix').classList.toggle('active', m === 'pix');
-    document.getElementById('tab-card').classList.toggle('active', m === 'card');
-    document.getElementById('area-cartao').style.display = m === 'card' ? 'block' : 'none';
-    document.getElementById('area-pix').style.display = 'none';
-  }
+      <!-- INFORMA脟脮ES PARA ENTREGA -->
+      <div class="form-group">
+        <label><i class="fas fa-map-pin"></i> Endere莽o de entrega (Caraguatatuba)</label>
+        <input type="text" id="deliveryAddress" placeholder="Rua, n煤mero, bairro, ponto de refer锚ncia" value="Av. S茫o Francisco, 300 - Centro">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Seu nome completo</label>
+        <input type="text" id="customerName" placeholder="Nome para contato" value="Cliente">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> E-mail (necess谩rio para pagamento online)</label>
+        <input type="email" id="customerEmail" placeholder="seuemail@exemplo.com" value="cliente@email.com">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-comment-dots"></i> Observa莽玫es (opcional)</label>
+        <textarea id="orderNotes" rows="2" placeholder="Ex: sem cebola, trocar molho, talheres, etc."></textarea>
+      </div>
 
-  // --- 3. PAGAMENTO ---
-  document.getElementById('pagarBtn').addEventListener('click', async () => {
-    const status = document.getElementById('status');
-    const email = document.getElementById('email-cliente').value;
-    if(carrinho.length === 0) return alert("Adicione itens!");
-    if(!email) return alert("Preencha o e-mail!");
+      <!-- DIVISOR ENTRE OP脟脮ES -->
+      <div class="payment-divider">
+        <hr> <span>Op莽茫o 1 - Pagamento Online</span> <hr>
+      </div>
+      
+      <!-- SELE脟脙O DO M脡TODO DE PAGAMENTO MERCADO PAGO -->
+      <div class="form-group">
+        <label><i class="fas fa-credit-card"></i> M茅todo de pagamento (Mercado Pago)</label>
+        <select id="mpPaymentMethod">
+          <option value="pix">馃挸 Pix (instant芒neo)</option>
+          <option value="credit_card">馃挸 Cart茫o de Cr茅dito</option>
+          <option value="debit_card">馃挸 Cart茫o de D茅bito</option>
+          <option value="ticket">馃搫 Boleto Banc谩rio</option>
+        </select>
+      </div>
 
-    status.innerText = "🚀 Processando...";
-    const total = carrinho.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
+      <button id="mercadopagoBtn" class="mercadopago-btn">
+        <i class="fab fa-mercadopago"></i> Pagar com Mercado Pago
+      </button>
+      <div id="mpStatus" class="status-msg"></div>
 
-    try {
-        const resp = await fetch('/.netlify/functions/create-payment', {
-            method: 'POST',
-            body: JSON.stringify({ type: metodo, amount: total, payer: { email: email } })
+      <div class="payment-divider">
+        <hr> <span>Op莽茫o 2 - Pedido via WhatsApp</span> <hr>
+      </div>
+
+      <div class="whatsapp-info">
+        <i class="fab fa-whatsapp fa-lg" style="color:#25D366"></i>
+        <p>Pague na entrega (dinheiro, cart茫o ou Pix presencial) ou confirme com a loja.</p>
+        <div class="whatsapp-number"><i class="fab fa-whatsapp"></i> (14) 99702-6250</div>
+      </div>
+
+      <button id="whatsappOrderBtn" class="whatsapp-btn"><i class="fab fa-whatsapp fa-lg"></i> Enviar Pedido via WhatsApp</button>
+      <div id="paymentStatus" class="status-msg"></div>
+      <div style="font-size: 0.7rem; margin-top: 10px; text-align: center; color: #a87a60;">
+        <i class="fas fa-shield-alt"></i> Pagamento seguro com Mercado Pago 鈥�1锟�7 Pedido sujeito 脿 confirma莽茫o da loja
+      </div>
+    </div>
+  </div>
+  <footer>
+    <i class="fab fa-whatsapp"></i> Lanch茫o Caragu谩 - Pe莽a direto pelo WhatsApp ou pague online com Mercado Pago 鈥�1锟�7 Entregamos em toda Caraguatatuba, praias e regi茫o.<br>
+    Aceitamos todas as formas de pagamento: Cart茫o, D茅bito, Pix, Boleto via Mercado Pago ou dinheiro na entrega.
+  </footer>
+
+  <script>
+    // ======================= CARD脕PIO COMPLETO COM CATEGORIAS =======================
+    const produtos = [
+      { id: 1, nome: "X-Salada Especial", descricao: "Hamb煤rguer 150g, alface, tomate, queijo mussarela e maionese da casa", preco: 22.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=180&fit=crop" },
+      { id: 2, nome: "X-Bacon Supreme", descricao: "Duas carnes, bacon crocante, cheddar e molho barbecue", preco: 28.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=300&h=180&fit=crop" },
+      { id: 3, nome: "Cheddar Duplo", descricao: "P茫o australiano, blend de cheddar, carne e onion rings", preco: 32.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&h=180&fit=crop" },
+      { id: 7, nome: "Veggie Burger", descricao: "Hamb煤rguer de gr茫o-de-bico, queijo vegano, alface, tomate e molho especial", preco: 26.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?w=300&h=180&fit=crop" },
+      { id: 4, nome: "Hot Dog Completo", descricao: "Sals茫o, pur锚, vinagrete, batata palha e catupiry", preco: 16.90, categoria: "especiais", imagem: "https://images.unsplash.com/photo-1613828364875-5317093d6e20?w=300&h=180&fit=crop" },
+      { id: 8, nome: "X-Frango com Catupiry", descricao: "Peito de frango desfiado, catupiry, milho e ervilha", preco: 24.90, categoria: "especiais", imagem: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=180&fit=crop" },
+      { id: 5, nome: "Batata Frita com Cheddar", descricao: "Batata r煤stica com cheddar e bacon crocante", preco: 14.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1630384060421-cb20f0e0649d?w=300&h=180&fit=crop" },
+      { id: 9, nome: "Onion Rings", descricao: "An茅is de cebola empanados crocantes, servidos com molho ros茅", preco: 16.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1639024471283-af188151b8be?w=300&h=180&fit=crop" },
+      { id: 10, nome: "Nuggets de Frango", descricao: "10 unidades com molho agridoce", preco: 19.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1562967916-eb82221c8f3b?w=300&h=180&fit=crop" },
+      { id: 6, nome: "Milkshake de Chocolate", descricao: "Tradicional, com calda e chantilly", preco: 15.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300&h=180&fit=crop" },
+      { id: 11, nome: "Refrigerante Lata", descricao: "Coca-Cola, Guaran谩, Fanta (escolha nos coment谩rios)", preco: 6.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=300&h=180&fit=crop" },
+      { id: 12, nome: "Suco Natural", descricao: "Laranja, lim茫o ou maracuj谩 (500ml)", preco: 8.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&h=180&fit=crop" },
+      { id: 13, nome: "Petit Gateau", descricao: "Bolo de chocolate com casquinha e sorvete de baunilha", preco: 13.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1624353364406-3f6974b1dac5?w=300&h=180&fit=crop" }
+    ];
+
+    const categorias = [
+      { id: "hamburgueres", nome: "馃崝 Hamb煤rgueres Artesanais", icone: "fa-hamburger" },
+      { id: "especiais", nome: "馃尛 Especiais & Sandu铆ches", icone: "fa-hotdog" },
+      { id: "porcoes", nome: "馃崯 Por莽玫es & Acompanhamentos", icone: "fa-french-fries" },
+      { id: "bebidas", nome: "馃イ Bebidas & Sobremesas", icone: "fa-cocktail" }
+    ];
+
+    let carrinho = [];
+
+    // DOM
+    const categoriesContainer = document.getElementById('categories-container');
+    const cartContainer = document.getElementById('cartItemsContainer');
+    const cartTotalSpan = document.getElementById('cartTotalValue');
+    const clearCartBtn = document.getElementById('clearCartBtn');
+    const whatsappBtn = document.getElementById('whatsappOrderBtn');
+    const paymentStatusDiv = document.getElementById('paymentStatus');
+    const mpStatusDiv = document.getElementById('mpStatus');
+    const deliveryAddressInput = document.getElementById('deliveryAddress');
+    const customerNameInput = document.getElementById('customerName');
+    const customerEmailInput = document.getElementById('customerEmail');
+    const orderNotesInput = document.getElementById('orderNotes');
+    const mercadopagoBtn = document.getElementById('mercadopagoBtn');
+    const mpPaymentMethod = document.getElementById('mpPaymentMethod');
+
+    const NUMERO_WHATSAPP = "5514997026250";
+    // ENDPOINT DO BACKEND PARA MERCADO PAGO (VOC脢 DEVE SUBSTITUIR PELA URL DO SEU SERVIDOR)
+    // Exemplo: "https://seudominio.com/api/create-preference" ou "http://localhost:3000/create-preference"
+    const MP_BACKEND_URL = "http://localhost:3000/create-preference";  // <-- ALTERE PARA SEU BACKEND REAL
+
+    // Renderizar card谩pio
+    function renderCardapio() {
+      categoriesContainer.innerHTML = '';
+      for (let cat of categorias) {
+        const produtosDaCategoria = produtos.filter(p => p.categoria === cat.id);
+        if (produtosDaCategoria.length === 0) continue;
+        
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'menu-category';
+        categoryDiv.innerHTML = `
+          <div class="category-title">
+            <i class="fas ${cat.icone}"></i> ${cat.nome}
+          </div>
+          <div class="products-grid" data-cat="${cat.id}"></div>
+        `;
+        categoriesContainer.appendChild(categoryDiv);
+        
+        const grid = categoryDiv.querySelector('.products-grid');
+        produtosDaCategoria.forEach(prod => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <img class="product-img" src="${prod.imagem}" alt="${prod.nome}" loading="lazy" onerror="this.src='https://placehold.co/300x180?text=Lanches+Caragu谩'">
+            <div class="product-info">
+              <div class="product-name">${prod.nome}</div>
+              <div class="product-desc">${prod.descricao}</div>
+              <div class="price-add">
+                <span class="product-price">R$ ${prod.preco.toFixed(2)}</span>
+                <button class="add-to-cart" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> Adicionar</button>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
         });
-        const data = await resp.json();
+      }
+      document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.removeEventListener('click', handleAddToCart);
+        btn.addEventListener('click', handleAddToCart);
+      });
+    }
 
-        if(metodo === 'pix' && data.qr_code) {
-            document.getElementById('area-pix').style.display = 'block';
-            document.getElementById('qr-code-view').innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" width="150">`;
-            document.getElementById('pix-copy').value = data.qr_code;
-            status.innerHTML = "<span style='color:orange'>Aguardando Pix...</span>";
-        } else if(data.status === 'approved') {
-            status.innerHTML = "<span style='color:green'>✅ Pago com sucesso!</span>";
-            carrinho = []; atualizarCarrinho();
+    function handleAddToCart(e) {
+      const btn = e.currentTarget;
+      const prodId = parseInt(btn.getAttribute('data-id'));
+      const produto = produtos.find(p => p.id === prodId);
+      if (produto) {
+        adicionarAoCarrinho(produto);
+      }
+    }
+
+    function adicionarAoCarrinho(produto) {
+      const existente = carrinho.find(item => item.id === produto.id);
+      if (existente) {
+        existente.quantidade += 1;
+      } else {
+        carrinho.push({
+          id: produto.id,
+          nome: produto.nome,
+          preco: produto.preco,
+          quantidade: 1
+        });
+      }
+      atualizarCarrinhoUI();
+      mostrarStatusTemp(`${produto.nome} adicionado!`, "sucesso", paymentStatusDiv);
+    }
+
+    function removerItemCarrinho(id) {
+      carrinho = carrinho.filter(item => item.id !== id);
+      atualizarCarrinhoUI();
+    }
+
+    function alterarQuantidade(id, delta) {
+      const item = carrinho.find(i => i.id === id);
+      if (item) {
+        const novaQtd = item.quantidade + delta;
+        if (novaQtd <= 0) {
+          removerItemCarrinho(id);
+        } else {
+          item.quantidade = novaQtd;
+          atualizarCarrinhoUI();
         }
-    } catch (err) { status.innerText = "❌ Erro no servidor."; }
-  });
+      }
+    }
 
-  renderMenu();
-</script>
+    function limparCarrinho() {
+      if (carrinho.length === 0) return;
+      carrinho = [];
+      atualizarCarrinhoUI();
+      mostrarStatusTemp("Carrinho limpo", "info", paymentStatusDiv);
+    }
+
+    function calcularTotal() {
+      return carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+    }
+
+    function atualizarCarrinhoUI() {
+      const total = calcularTotal();
+      cartTotalSpan.innerText = `R$ ${total.toFixed(2)}`;
+
+      if (carrinho.length === 0) {
+        cartContainer.innerHTML = `<div class="empty-cart-msg">Seu carrinho est谩 vazio 馃崝<br>Adicione deliciosos lanches do card谩pio!</div>`;
+        return;
+      }
+
+      let html = '';
+      carrinho.forEach(item => {
+        const subtotal = item.preco * item.quantidade;
+        html += `
+          <div class="cart-item" data-id="${item.id}">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.nome}</div>
+              <div class="cart-item-price">R$ ${item.preco.toFixed(2)}</div>
+            </div>
+            <div class="cart-item-qty">
+              <button class="qty-btn dec-qty" data-id="${item.id}">-</button>
+              <span style="min-width: 24px; text-align:center;">${item.quantidade}</span>
+              <button class="qty-btn inc-qty" data-id="${item.id}">+</button>
+            </div>
+            <div class="cart-item-subtotal">R$ ${subtotal.toFixed(2)}</div>
+            <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+      cartContainer.innerHTML = html;
+
+      document.querySelectorAll('.dec-qty').forEach(btn => {
+        btn.removeEventListener('click', decHandler);
+        btn.addEventListener('click', decHandler);
+      });
+      document.querySelectorAll('.inc-qty').forEach(btn => {
+        btn.removeEventListener('click', incHandler);
+        btn.addEventListener('click', incHandler);
+      });
+      document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.removeEventListener('click', removeHandler);
+        btn.addEventListener('click', removeHandler);
+      });
+    }
+
+    function decHandler(e) {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      alterarQuantidade(id, -1);
+    }
+    function incHandler(e) {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      alterarQuantidade(id, 1);
+    }
+    function removeHandler(e) {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      removerItemCarrinho(id);
+    }
+
+    function mostrarStatusTemp(msg, tipo, container) {
+      const color = tipo === 'sucesso' ? '#1f7a5a' : (tipo === 'erro' ? '#b85c3a' : '#b87a3a');
+      container.innerHTML = `<span style="color: ${color}"><i class="fas ${tipo === 'sucesso' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}</span>`;
+      setTimeout(() => {
+        if (container.innerHTML.includes(msg)) container.innerHTML = '';
+      }, 4000);
+    }
+
+    // FUN脟脙O PAGAMENTO MERCADO PAGO
+    async function iniciarPagamentoMercadoPago() {
+      if (carrinho.length === 0) {
+        mostrarStatusTemp("Seu carrinho est谩 vazio! Adicione itens antes de pagar.", "erro", mpStatusDiv);
+        return;
+      }
+      const nomeCliente = customerNameInput.value.trim();
+      const emailCliente = customerEmailInput.value.trim();
+      if (!emailCliente || !emailCliente.includes('@')) {
+        mostrarStatusTemp("Informe um e-mail v谩lido para continuar com o pagamento.", "erro", mpStatusDiv);
+        return;
+      }
+      const endereco = deliveryAddressInput.value.trim() || "N茫o informado";
+      const observacoes = orderNotesInput.value.trim();
+      const totalPedido = calcularTotal();
+      const metodoPagamento = mpPaymentMethod.value;
+
+      // Monta lista de itens para a prefer锚ncia
+      const itens = carrinho.map(item => ({
+        title: item.nome,
+        quantity: item.quantidade,
+        unit_price: item.preco,
+        currency_id: "BRL"
+      }));
+
+      const payload = {
+        items: itens,
+        payer: {
+          name: nomeCliente || "Cliente",
+          email: emailCliente,
+        },
+        payment_methods: {
+          excluded_payment_methods: [],
+          excluded_payment_types: [],
+          installments: 6
+        },
+        external_reference: `pedido_${Date.now()}`,
+        description: `Pedido Lanch茫o Caragu谩 - ${observacoes.substring(0, 100)}`,
+        metadata: {
+          endereco_entrega: endereco,
+          observacoes: observacoes,
+          metodo_pagamento_selecionado: metodoPagamento
+        },
+        // Opcional: for莽ar m茅todo de pagamento? A prefer锚ncia permite configurar, mas deixamos aberto.
+        // O campo 'payment_methods' pode ser ajustado.
+      };
+
+      // Se quiser filtrar por tipo de pagamento selecionado (Pix, cart茫o etc) 
+      // podemos adaptar enviando uma prefer锚ncia com payment_methods restrito. 
+      // Para simplificar, o usu谩rio escolhe no checkout do Mercado Pago, mas podemos for莽ar via back-end.
+      // Vamos apenas enviar o m茅todo como metadata; no backend voc锚 pode configurar a prefer锚ncia conforme o m茅todo.
+
+      try {
+        mpStatusDiv.innerHTML = '<span style="color:#0079c1;"><i class="fas fa-spinner fa-pulse"></i> Criando pagamento, aguarde...</span>';
+        const response = await fetch(MP_BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (data && data.init_point) {
+          // Redireciona para o checkout do Mercado Pago
+          window.location.href = data.init_point;
+        } else if (data && data.qr_code) {
+          // Se for Pix, pode exibir QR Code, mas o padr茫o 茅 init_point
+          window.location.href = data.init_point || data.qr_code;
+        } else {
+          throw new Error(data.message || "Erro ao gerar prefer锚ncia de pagamento.");
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarStatusTemp("Erro ao conectar com o Mercado Pago. Verifique se o backend est谩 ativo. Detalhes: " + error.message, "erro", mpStatusDiv);
+      }
+    }
+
+    // ENVIAR PEDIDO WHATSAPP (mantido)
+    function enviarPedidoWhatsApp() {
+      if (carrinho.length === 0) {
+        mostrarStatusTemp("Seu carrinho est谩 vazio! Adicione itens antes de enviar o pedido.", "erro", paymentStatusDiv);
+        return;
+      }
+      const endereco = deliveryAddressInput.value.trim();
+      if (!endereco) {
+        mostrarStatusTemp("Por favor, informe o endere莽o de entrega em Caraguatatuba.", "erro", paymentStatusDiv);
+        return;
+      }
+      const nomeCliente = customerNameInput.value.trim() || "Cliente";
+      const observacoes = orderNotesInput.value.trim();
+      const totalPedido = calcularTotal();
+
+      let itensTexto = "";
+      carrinho.forEach(item => {
+        const subtotal = item.preco * item.quantidade;
+        itensTexto += `馃崝 *${item.nome}* x${item.quantidade} = R$ ${subtotal.toFixed(2)}\n`;
+      });
+
+      const mensagem = `*NOVO PEDIDO - LANCH脙O CARAGU脕* 馃崝馃崯\n\n` +
+                       `馃懁 *Cliente:* ${nomeCliente}\n` +
+                       `馃搷 *Endere莽o de entrega:* ${endereco}\n` +
+                       `馃摝 *Itens do pedido:*\n${itensTexto}\n` +
+                       `馃挵 *Total:* R$ ${totalPedido.toFixed(2)}\n` +
+                       (observacoes ? `馃摑 *Observa莽玫es:* ${observacoes}\n` : '') +
+                       `\n馃敂 *Forma de pagamento:* Confirmar com cliente (Cart茫o, Pix ou Dinheiro na entrega)\n` +
+                       `馃殌 *Entrega em Caraguatatuba* - Aguardo confirma莽茫o!`;
+
+      const msgCodificada = encodeURIComponent(mensagem);
+      const linkWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${msgCodificada}`;
+      paymentStatusDiv.innerHTML = `<span style="color:#128C7E;"><i class="fab fa-whatsapp"></i> Redirecionando para o WhatsApp... Aguarde!</span>`;
+      setTimeout(() => {
+        window.open(linkWhatsApp, '_blank');
+        // Limpar carrinho opcional
+        carrinho = [];
+        atualizarCarrinhoUI();
+        mostrarStatusTemp("Pedido enviado! Em breve nossa equipe confirmar谩.", "sucesso", paymentStatusDiv);
+      }, 300);
+    }
+
+    // Eventos
+    clearCartBtn.addEventListener('click', limparCarrinho);
+    whatsappBtn.addEventListener('click', enviarPedidoWhatsApp);
+    mercadopagoBtn.addEventListener('click', iniciarPagamentoMercadoPago);
+
+    renderCardapio();
+    atualizarCarrinhoUI();
+    
+    
+    
+    
+    
+    const express = require('express');
+const cors = require('cors');
+const mercadopago = require('mercadopago');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Configure o Access Token do Mercado Pago
+// Obtenha em: https://www.mercadopago.com.br/developers/panel
+// Use token de teste ou produ莽茫o
+mercadopago.configure({
+  access_token: 'APP_USR-1334029455771509-040420-36979594d79384a46f840b2a7248226b-358581720'
+});
+
+app.post('/create-preference', async (req, res) => {
+  try {
+    const { items, payer, payment_methods, external_reference, description, metadata } = req.body;
+
+    const preference = {
+      items: items,
+      payer: payer,
+      payment_methods: payment_methods || {
+        installments: 6,
+        excluded_payment_methods: [],
+        excluded_payment_types: []
+      },
+      external_reference: external_reference || `pedido_${Date.now()}`,
+      description: description || 'Pedido Lanch茫o Caragu谩',
+      metadata: metadata || {},
+      back_urls: {
+        success: 'https://seudominio.com/sucesso',  // URL ap贸s pagamento aprovado
+        failure: 'https://seudominio.com/falha',
+        pending: 'https://seudominio.com/pendente'
+      },
+      auto_return: 'approved',
+      notification_url: 'https://seudominio.com/webhook' // opcional
+    };
+
+    const response = await mercadopago.preferences.create(preference);
+    res.json({ init_point: response.body.init_point });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.listen(3000, () => console.log('Backend Mercado Pago rodando na porta 3000'));
+    
+    
+    
+  </script>
 </body>
 </html>
+
+
+
