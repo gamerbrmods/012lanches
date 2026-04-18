@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lanchão Caraguá | Premium Delivery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <style>
+    :root {
+      --primary: #e63946;
+      --secondary: #1d3557;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-muted: #6c757d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--bg); color: var(--secondary); line-height: 1.6; overflow-x: hidden; }
+
+    .header { 
+        background: var(--primary); 
+        color: white; 
+        padding: 4rem 2rem 3rem; 
+        text-align: center; 
+        border-bottom-left-radius: 40px; 
+        border-bottom-right-radius: 40px; 
+        margin-bottom: 2rem; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .top-bar {
+        position: absolute; top: 20px; right: 30px;
+        display: flex; align-items: center; gap: 10px;
+        cursor: pointer; background: rgba(255,255,255,0.2);
+        padding: 8px 15px; border-radius: 30px;
+        transition: 0.3s; border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .container { max-width: 1100px; margin: auto; display: grid; grid-template-columns: 1fr 380px; gap: 2rem; padding: 0 20px 40px; }
+
+    #mini-mapa { position: fixed; bottom: 20px; left: 20px; width: 250px; height: 200px; border-radius: 20px; border: 3px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 900; overflow: hidden; }
+
+    .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .produto-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; transition: transform 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; flex-direction: column; }
+    .produto-card:hover { transform: translateY(-5px); }
+    .produto-img { width: 100%; height: 180px; object-fit: cover; }
+    .produto-info { padding: 1.2rem; flex-grow: 1; display: flex; flex-direction: column; }
+    .produto-preco { color: var(--primary); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; display: block; }
+    
+    .btn-add { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+
+    .checkout-side { background: white; border-radius: 25px; padding: 1.5rem; position: sticky; top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: fit-content; border: 2px solid var(--primary); }
+    .total-box { font-size: 1.4rem; font-weight: 700; text-align: center; margin: 1.5rem 0; padding: 15px; background: #fff5f5; border-radius: 15px; color: var(--primary); border: 1px dashed var(--primary); }
+
+    .tabs { display: flex; gap: 10px; margin-bottom: 1rem; }
+    .tab { flex: 1; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; background: #eee; font-weight: 600; }
+    .tab.active { background: var(--secondary); color: white; }
+
+    input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1.5px solid #eee; border-radius: 10px; outline: none; }
+    .btn-finalizar { width: 100%; background: #27ae60; color: white; border: none; padding: 15px; border-radius: 15px; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-content { background: white; padding: 2.5rem; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+
+    .footer { background: var(--secondary); color: white; padding: 4rem 1rem 2rem; text-align: center; margin-top: 50px; }
+    
+    @media (max-width: 850px) { 
+      .container { grid-template-columns: 1fr; }
+      #mini-mapa { width: 150px; height: 150px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="top-bar" onclick="showAuth('login')">
+    <i class="fas fa-user-circle"></i>
+    <span>Minha Conta</span>
+  </div>
+  <h1>🍔 Lanchão Caraguá</h1>
+  <p>O melhor sabor do litoral direto na sua mesa</p>
+</header>
+
+<div class="container">
+  <div class="cardapio">
+    <div class="grid-produtos" id="menu-produtos"></div>
+  </div>
+
+  <div class="checkout-side" id="area-pagamento">
+    <h3>🛒 Seu Pedido</h3>
+    <div id="lista-carrinho"><p style="text-align:center;color:#888;padding:20px;">Carrinho vazio</p></div>
+    <div class="total-box" id="total-display">R$ 0,00</div>
+
+    <div id="dados-cliente">
+      <input type="text" id="nome-cliente" placeholder="Nome Completo">
+      <input type="email" id="email-cliente" placeholder="E-mail para recibo">
+      <input type="text" id="tel-cliente" placeholder="WhatsApp / Telefone">
+      <input type="text" id="end-cliente" placeholder="Endereço de Entrega">
+    </div>
+
+    <div class="tabs">
+      <div id="tab-pix" class="tab active" onclick="setMetodo('pix')">PIX</div>
+      <div id="tab-card" class="tab" onclick="setMetodo('card')">Cartão</div>
+    </div>
+
+    <div id="area-pix" style="text-align:center; display:none;">
+       <div id="qr-code-view" style="background:#f8f9fa; padding:10px; border-radius:10px; margin-bottom:10px;"></div>
+       <input type="text" id="pix-copy" readonly style="font-size:0.7rem; text-align:center;">
+    </div>
+
+    <div id="area-cartao" style="display:none;">
+      <input type="text" id="cardNumber" placeholder="Número do Cartão">
+      <input type="text" id="docNumber" placeholder="CPF do Titular">
+    </div>
+
+    <button class="btn-finalizar" id="pagarBtn">Confirmar e Pagar</button>
+    <div id="status" style="margin-top:15px; text-align:center; font-weight:600;"></div>
+  </div>
+</div>
+
+<div id="mini-mapa"></div>
+
+<footer class="footer">
+  <p>© 2026 Lanchão Caraguá - Centro, Caraguatatuba - SP</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // --- 1. CONFIGURAÇÃO DO MAPA (LOJA FIXA) ---
+  const map = L.map('mini-mapa', { 
+    zoomControl: false, attributionControl: false 
+  }).setView([-23.6226, -45.4124], 16);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  
+  const lojaIcon = L.divIcon({ 
+    html: `<div style="background: #e63946; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+             <i class="fas fa-utensils" style="color: white; transform: rotate(45deg); font-size: 14px;"></i>
+           </div>`, 
+    className: 'dummy', iconSize: [32, 32], iconAnchor: [16, 32]
+  });
+  
+  
+  
+  L.marker([-23.6226, -45.4124], {icon: lojaIcon}).addTo(map)
+
+    
+  // --- 2. DADOS E CARRINHO ---
+  const produtos = [
+    { id: 1, nome: "X-Salada Especial", preco: 25.0, desc: "Blend bovino 150g, queijo, alface e tomate.", img: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=500" },
+    { id: 2, nome: "Cheddar Bacon", preco: 32.9, desc: "Muito bacon crocante e cheddar cremoso.", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500" },
+    { id: 3, nome: "Batata Suprema", preco: 18.0, desc: "Batatas rústicas com queijo e bacon.", img: "https://imagens.imirante.com.br/imagens/noticias/2024/04/07/kRzVAJoNICHti4nHq0VPYtK5tBWjWOzuOgYOmJNc.jpg?w=500" },
+    { id: 4, nome: "Milkshake Oreo", preco: 15.0, desc: "Sorvete premium e pedaços de Oreo.", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500" },
+    { id: 5, nome: "Coca Cola 2L", preco: 12.0, desc: "Gelada e refrescante.", img: "https://i5.walmartimages.com/asr/ecd01808-b785-4eaf-830d-81465657fa97.ed8ff2135314831c1c115a83cce1fcde.jpeg?w=500" }
+  ];
+
+  let carrinho = [];
+  let metodo = 'pix';
+
+  function renderMenu() {
+    document.getElementById('menu-produtos').innerHTML = produtos.map(p => `
+      <div class="produto-card">
+        <img src="${p.img}" class="produto-img">
+        <div class="produto-info">
+          <h4>${p.nome}</h4>
+          <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">${p.desc}</p>
+          <span class="produto-preco">R$ ${p.preco.toFixed(2)}</span>
+          <button class="btn-add" onclick="addCarrinho(${p.id})">Adicionar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function addCarrinho(id) {
+    const item = produtos.find(p => p.id === id);
+    const jaTem = carrinho.find(c => c.id === id);
+    if(jaTem) jaTem.qtd++; else carrinho.push({...item, qtd: 1});
+    atualizarCarrinho();
+  }
+
+  function atualizarCarrinho() {
+    const lista = document.getElementById('lista-carrinho');
+    const totalDisplay = document.getElementById('total-display');
+    if(carrinho.length === 0) {
+      lista.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">Carrinho vazio</p>';
+      totalDisplay.innerText = "R$ 0,00";
+      return;
+    }
+    let total = 0;
+    lista.innerHTML = carrinho.map(i => {
+      total += i.preco * i.qtd;
+      return `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.qtd}x ${i.nome}</span><strong>R$ ${(i.preco*i.qtd).toFixed(2)}</strong></div>`;
+    }).join('');
+    totalDisplay.innerText = `R$ ${total.toFixed(2)}`;
+  }
+
+  function setMetodo(m) {
+    metodo = m;
+    document.getElementById('tab-pix').classList.toggle('active', m === 'pix');
+    document.getElementById('tab-card').classList.toggle('active', m === 'card');
+    document.getElementById('area-cartao').style.display = m === 'card' ? 'block' : 'none';
+    document.getElementById('area-pix').style.display = 'none';
+  }
+
+  // --- 3. PAGAMENTO ---
+  document.getElementById('pagarBtn').addEventListener('click', async () => {
+    const status = document.getElementById('status');
+    const email = document.getElementById('email-cliente').value;
+    if(carrinho.length === 0) return alert("Adicione itens!");
+    if(!email) return alert("Preencha o e-mail!");
+
+    status.innerText = "🚀 Processando...";
+    const total = carrinho.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
+
+    try {
+        const resp = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            body: JSON.stringify({ type: metodo, amount: total, payer: { email: email } })
+        });
+        const data = await resp.json();
+
+        if(metodo === 'pix' && data.qr_code) {
+            document.getElementById('area-pix').style.display = 'block';
+            document.getElementById('qr-code-view').innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" width="150">`;
+            document.getElementById('pix-copy').value = data.qr_code;
+            status.innerHTML = "<span style='color:orange'>Aguardando Pix...</span>";
+        } else if(data.status === 'approved') {
+            status.innerHTML = "<span style='color:green'>✅ Pago com sucesso!</span>";
+            carrinho = []; atualizarCarrinho();
+        }
+    } catch (err) { status.innerText = "❌ Erro no servidor."; }
+  });
+
+  renderMenu();
+</script>
+</body>
+</html>
