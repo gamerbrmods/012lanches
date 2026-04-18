@@ -1,118 +1,90 @@
-const axios = require('axios');
-const crypto = require('crypto');
+const mercadopago = require('mercadopago');
 
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Método não permitido' }) };
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
   }
 
   try {
-    const accessToken = process.env.MP_ACCESS_TOKEN;
-    if (!accessToken) throw new Error('Token não configurado');
+    mercadopago.configure({
+      access_token: process.env.MP_ACCESS_TOKEN
+    });
 
-    const body = JSON.parse(event.body || '{}');
-    const { type, amount, description, payer, paymentMethodId, token, installments, issuerId } = body;
+    const body = JSON.parse(event.body);
+    const { type, amount, description, payer, token, installments, paymentMethodId, docNumber, cardholderName } = body;
 
-    if (!amount || amount <= 0) throw new Error('Valor inválido');
-    if (!payer || !payer.email) throw new Error('E-mail do pagador é obrigatório');
+    let paymentData = {
+      transaction_amount: Number(amount),
+      description: description,
+      payment_method_id: paymentMethodId,
+      payer: {
+        email: payer.email,
+        first_name: payer.first_name,
+        last_name: payer.last_name,
+        identification: {
+          type: 'CPF',
+          number: docNumber
+        }
+      }
+    };
 
-    // Gera uma chave de idempotência única para cada requisição
-    const idempotencyKey = crypto.randomBytes(16).toString('hex');
-
+    // Para PIX
     if (type === 'pix') {
-      const paymentData = {
-        transaction_amount: Number(amount),
-        description: description || 'Pedido Lanchão Caraguá',
-        payment_method_id: 'pix',
-        payer: {
-          email: payer.email,
-          first_name: payer.first_name || (payer.name?.split(' ')[0] || 'Cliente'),
-          last_name: payer.last_name || (payer.name?.split(' ')[1] || ''),
-        },
-      };
-
-      const response = await axios.post(
-        'https://api.mercadopago.com/v1/payments',
-        paymentData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-            'X-Idempotency-Key': idempotencyKey,
-          },
-        }
-      );
-
-      const data = response.data;
+      paymentData.payment_method_id = 'pix';
+      const response = await mercadopago.payment.create(paymentData);
+      
       return {
-        statusCode: 200,
+        statusCode: 201,
         headers,
         body: JSON.stringify({
-          status: data.status,
-          qr_code: data.point_of_interaction?.transaction_data?.qr_code,
-          qr_code_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
-          ticket_url: data.point_of_interaction?.transaction_data?.ticket_url,
-          payment_id: data.id,
-        }),
+          status: response.body.status,
+          status_detail: response.body.status_detail,
+          qr_code: response.body.point_of_interaction?.transaction_data?.qr_code,
+          qr_code_base64: response.body.point_of_interaction?.transaction_data?.qr_code_base64,
+          payment_id: response.body.id
+        })
       };
-    }
-
-    if (type === 'card') {
-      if (!paymentMethodId || !token) throw new Error('Dados de cartão incompletos');
-
-      const paymentData = {
-        transaction_amount: Number(amount),
-        description: description || 'Pedido Lanchão Caraguá',
-        payment_method_id: paymentMethodId,
-        issuer_id: issuerId,
-        installments: installments || 1,
-        token: token,
-        payer: {
-          email: payer.email,
-          first_name: payer.first_name || (payer.name?.split(' ')[0] || 'Cliente'),
-          last_name: payer.last_name || (payer.name?.split(' ')[1] || ''),
-          identification: payer.identification || { type: 'CPF', number: '00000000000' },
-        },
-      };
-
-      const response = await axios.post(
-        'https://api.mercadopago.com/v1/payments',
-        paymentData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-            'X-Idempotency-Key': idempotencyKey,
-          },
-        }
-      );
-
-      const data = response.data;
+    } 
+    // Para Cartão de Crédito/Débito
+    else if (type === 'card') {
+      paymentData.token = token;
+      paymentData.installments = Number(installments);
+      paymentData.cardholder_name = cardholderName;
+      
+      const response = await mercadopago.payment.create(paymentData);
+      
       return {
-        statusCode: 200,
+        statusCode: 201,
         headers,
         body: JSON.stringify({
-          status: data.status,
-          id: data.id,
-          status_detail: data.status_detail,
-        }),
+          status: response.body.status,
+          status_detail: response.body.status_detail,
+          payment_id: response.body.id,
+          card: {
+            last_four_digits: response.body.card?.last_four_digits,
+            first_six_digits: response.body.card?.first_six_digits,
+            expiration_month: response.body.card?.expiration_month,
+            expiration_year: response.body.card?.expiration_year
+          }
+        })
       };
     }
-
-    throw new Error('Método de pagamento inválido');
+    
   } catch (error) {
-    console.error('Erro:', error.response?.data || error.message);
+    console.error('Erro no pagamento:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.response?.data?.message || error.message }),
+      body: JSON.stringify({ 
+        error: error.message,
+        cause: error.cause || 'Erro ao processar pagamento'
+      })
     };
   }
 };
