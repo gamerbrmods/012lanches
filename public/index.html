@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Lanch茫o Caragu谩 - Pe莽a pelo WhatsApp ou Pagamento Online | Card谩pio com Mercado Pago</title>
+  <title>Lanchão Caraguá - Peça pelo WhatsApp ou Pagamento Online | Cardápio com Mercado Pago</title>
   <!-- Google Fonts + Font Awesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -72,7 +72,7 @@
       gap: 2rem;
     }
 
-    /* Se莽茫o card谩pio online */
+    /* Seção cardápio online */
     .products-section {
       flex: 2;
       min-width: 260px;
@@ -280,7 +280,7 @@
       padding-top: 1rem;
       margin: 0.5rem 0 1.2rem;
     }
-    /* Se莽茫o WhatsApp */
+    /* Seção WhatsApp */
     .whatsapp-info {
       background: #e9f7ef;
       border-radius: 24px;
@@ -417,21 +417,21 @@
   <div class="header">
     <div class="header-content">
       <div class="logo">
-        <h1><i class="fab fa-whatsapp"></i> Lanch茫o Caragu谩</h1>
-        <p><i class="fas fa-map-marker-alt"></i> Caraguatatuba - Centro, Praia e Regi茫o</p>
+        <h1><i class="fab fa-whatsapp"></i> Lanchão Caraguá</h1>
+        <p><i class="fas fa-map-marker-alt"></i> Caraguatatuba - Centro, Praia e Região</p>
       </div>
       <div class="badge-local">
-        <i class="fab fa-whatsapp"></i> Pe莽a pelo WhatsApp | Pagamento Online com Mercado Pago
+        <i class="fab fa-whatsapp"></i> Peça pelo WhatsApp | Pagamento Online com Mercado Pago
       </div>
     </div>
   </div>
 
   <div class="main-container">
-    <!-- CARD脕PIO ONLINE -->
+    <!-- CARDÁPIO ONLINE -->
     <div class="products-section">
       <div class="menu-header">
-        <div class="section-title"><i class="fas fa-scroll"></i> Card谩pio Online</div>
-        <div class="menu-sub">Escolha seus lanches favoritos, adicione ao carrinho e finalize o pedido via WhatsApp ou pague online com Mercado Pago (Pix, cart茫o, boleto).</div>
+        <div class="section-title"><i class="fas fa-scroll"></i> Cardápio Online</div>
+        <div class="menu-sub">Escolha seus lanches favoritos, adicione ao carrinho e finalize o pedido via WhatsApp ou pague online com Mercado Pago (Pix, cartão, boleto).</div>
       </div>
       <div id="categories-container"></div>
     </div>
@@ -443,44 +443,44 @@
         <button class="clear-cart" id="clearCartBtn"><i class="fas fa-trash-alt"></i> Limpar</button>
       </div>
       <div id="cartItemsContainer" class="cart-items">
-        <div class="empty-cart-msg">Seu carrinho est谩 vazio 馃崝<br>Adicione deliciosos lanches do card谩pio!</div>
+        <div class="empty-cart-msg">Seu carrinho está vazio 🍔<br>Adicione deliciosos lanches do cardápio!</div>
       </div>
       <div id="cartTotalContainer" class="cart-total">
         <span>Total</span>
         <span id="cartTotalValue">R$ 0,00</span>
       </div>
 
-      <!-- INFORMA脟脮ES PARA ENTREGA -->
+      <!-- INFORMAÇÕES PARA ENTREGA -->
       <div class="form-group">
-        <label><i class="fas fa-map-pin"></i> Endere莽o de entrega (Caraguatatuba)</label>
-        <input type="text" id="deliveryAddress" placeholder="Rua, n煤mero, bairro, ponto de refer锚ncia" value="Av. S茫o Francisco, 300 - Centro">
+        <label><i class="fas fa-map-pin"></i> Endereço de entrega (Caraguatatuba)</label>
+        <input type="text" id="deliveryAddress" placeholder="Rua, número, bairro, ponto de referência" value="Av. São Francisco, 300 - Centro">
       </div>
       <div class="form-group">
         <label><i class="fas fa-user"></i> Seu nome completo</label>
         <input type="text" id="customerName" placeholder="Nome para contato" value="Cliente">
       </div>
       <div class="form-group">
-        <label><i class="fas fa-envelope"></i> E-mail (necess谩rio para pagamento online)</label>
+        <label><i class="fas fa-envelope"></i> E-mail (necessário para pagamento online)</label>
         <input type="email" id="customerEmail" placeholder="seuemail@exemplo.com" value="cliente@email.com">
       </div>
       <div class="form-group">
-        <label><i class="fas fa-comment-dots"></i> Observa莽玫es (opcional)</label>
+        <label><i class="fas fa-comment-dots"></i> Observações (opcional)</label>
         <textarea id="orderNotes" rows="2" placeholder="Ex: sem cebola, trocar molho, talheres, etc."></textarea>
       </div>
 
-      <!-- DIVISOR ENTRE OP脟脮ES -->
+      <!-- DIVISOR ENTRE OPÇÕES -->
       <div class="payment-divider">
-        <hr> <span>Op莽茫o 1 - Pagamento Online</span> <hr>
+        <hr> <span>Opção 1 - Pagamento Online</span> <hr>
       </div>
       
-      <!-- SELE脟脙O DO M脡TODO DE PAGAMENTO MERCADO PAGO -->
+      <!-- SELEÇÃO DO MÉTODO DE PAGAMENTO MERCADO PAGO -->
       <div class="form-group">
-        <label><i class="fas fa-credit-card"></i> M茅todo de pagamento (Mercado Pago)</label>
+        <label><i class="fas fa-credit-card"></i> Método de pagamento (Mercado Pago)</label>
         <select id="mpPaymentMethod">
-          <option value="pix">馃挸 Pix (instant芒neo)</option>
-          <option value="credit_card">馃挸 Cart茫o de Cr茅dito</option>
-          <option value="debit_card">馃挸 Cart茫o de D茅bito</option>
-          <option value="ticket">馃搫 Boleto Banc谩rio</option>
+          <option value="pix">💳 Pix (instantâneo)</option>
+          <option value="credit_card">💳 Cartão de Crédito</option>
+          <option value="debit_card">💳 Cartão de Débito</option>
+          <option value="ticket">📄 Boleto Bancário</option>
         </select>
       </div>
 
@@ -490,50 +490,50 @@
       <div id="mpStatus" class="status-msg"></div>
 
       <div class="payment-divider">
-        <hr> <span>Op莽茫o 2 - Pedido via WhatsApp</span> <hr>
+        <hr> <span>Opção 2 - Pedido via WhatsApp</span> <hr>
       </div>
 
       <div class="whatsapp-info">
         <i class="fab fa-whatsapp fa-lg" style="color:#25D366"></i>
-        <p>Pague na entrega (dinheiro, cart茫o ou Pix presencial) ou confirme com a loja.</p>
+        <p>Pague na entrega (dinheiro, cartão ou Pix presencial) ou confirme com a loja.</p>
         <div class="whatsapp-number"><i class="fab fa-whatsapp"></i> (14) 99702-6250</div>
       </div>
 
       <button id="whatsappOrderBtn" class="whatsapp-btn"><i class="fab fa-whatsapp fa-lg"></i> Enviar Pedido via WhatsApp</button>
       <div id="paymentStatus" class="status-msg"></div>
       <div style="font-size: 0.7rem; margin-top: 10px; text-align: center; color: #a87a60;">
-        <i class="fas fa-shield-alt"></i> Pagamento seguro com Mercado Pago 鈥�1锟�7 Pedido sujeito 脿 confirma莽茫o da loja
+        <i class="fas fa-shield-alt"></i> Pagamento seguro com Mercado Pago  1�7 Pedido sujeito à confirmação da loja
       </div>
     </div>
   </div>
   <footer>
-    <i class="fab fa-whatsapp"></i> Lanch茫o Caragu谩 - Pe莽a direto pelo WhatsApp ou pague online com Mercado Pago 鈥�1锟�7 Entregamos em toda Caraguatatuba, praias e regi茫o.<br>
-    Aceitamos todas as formas de pagamento: Cart茫o, D茅bito, Pix, Boleto via Mercado Pago ou dinheiro na entrega.
+    <i class="fab fa-whatsapp"></i> Lanchão Caraguá - Peça direto pelo WhatsApp ou pague online com Mercado Pago  1�7 Entregamos em toda Caraguatatuba, praias e região.<br>
+    Aceitamos todas as formas de pagamento: Cartão, Débito, Pix, Boleto via Mercado Pago ou dinheiro na entrega.
   </footer>
 
   <script>
-    // ======================= CARD脕PIO COMPLETO COM CATEGORIAS =======================
+    // ======================= CARDÁPIO COMPLETO COM CATEGORIAS =======================
     const produtos = [
-      { id: 1, nome: "X-Salada Especial", descricao: "Hamb煤rguer 150g, alface, tomate, queijo mussarela e maionese da casa", preco: 22.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=180&fit=crop" },
+      { id: 1, nome: "X-Salada Especial", descricao: "Hambúrguer 150g, alface, tomate, queijo mussarela e maionese da casa", preco: 22.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=180&fit=crop" },
       { id: 2, nome: "X-Bacon Supreme", descricao: "Duas carnes, bacon crocante, cheddar e molho barbecue", preco: 28.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=300&h=180&fit=crop" },
-      { id: 3, nome: "Cheddar Duplo", descricao: "P茫o australiano, blend de cheddar, carne e onion rings", preco: 32.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&h=180&fit=crop" },
-      { id: 7, nome: "Veggie Burger", descricao: "Hamb煤rguer de gr茫o-de-bico, queijo vegano, alface, tomate e molho especial", preco: 26.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?w=300&h=180&fit=crop" },
-      { id: 4, nome: "Hot Dog Completo", descricao: "Sals茫o, pur锚, vinagrete, batata palha e catupiry", preco: 16.90, categoria: "especiais", imagem: "https://images.unsplash.com/photo-1613828364875-5317093d6e20?w=300&h=180&fit=crop" },
+      { id: 3, nome: "Cheddar Duplo", descricao: "Pão australiano, blend de cheddar, carne e onion rings", preco: 32.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&h=180&fit=crop" },
+      { id: 7, nome: "Veggie Burger", descricao: "Hambúrguer de grão-de-bico, queijo vegano, alface, tomate e molho especial", preco: 26.90, categoria: "hamburgueres", imagem: "https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?w=300&h=180&fit=crop" },
+      { id: 4, nome: "Hot Dog Completo", descricao: "Salsão, purê, vinagrete, batata palha e catupiry", preco: 16.90, categoria: "especiais", imagem: "https://images.unsplash.com/photo-1613828364875-5317093d6e20?w=300&h=180&fit=crop" },
       { id: 8, nome: "X-Frango com Catupiry", descricao: "Peito de frango desfiado, catupiry, milho e ervilha", preco: 24.90, categoria: "especiais", imagem: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=180&fit=crop" },
-      { id: 5, nome: "Batata Frita com Cheddar", descricao: "Batata r煤stica com cheddar e bacon crocante", preco: 14.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1630384060421-cb20f0e0649d?w=300&h=180&fit=crop" },
-      { id: 9, nome: "Onion Rings", descricao: "An茅is de cebola empanados crocantes, servidos com molho ros茅", preco: 16.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1639024471283-af188151b8be?w=300&h=180&fit=crop" },
+      { id: 5, nome: "Batata Frita com Cheddar", descricao: "Batata rústica com cheddar e bacon crocante", preco: 14.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1630384060421-cb20f0e0649d?w=300&h=180&fit=crop" },
+      { id: 9, nome: "Onion Rings", descricao: "Anéis de cebola empanados crocantes, servidos com molho rosé", preco: 16.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1639024471283-af188151b8be?w=300&h=180&fit=crop" },
       { id: 10, nome: "Nuggets de Frango", descricao: "10 unidades com molho agridoce", preco: 19.90, categoria: "porcoes", imagem: "https://images.unsplash.com/photo-1562967916-eb82221c8f3b?w=300&h=180&fit=crop" },
       { id: 6, nome: "Milkshake de Chocolate", descricao: "Tradicional, com calda e chantilly", preco: 15.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300&h=180&fit=crop" },
-      { id: 11, nome: "Refrigerante Lata", descricao: "Coca-Cola, Guaran谩, Fanta (escolha nos coment谩rios)", preco: 6.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=300&h=180&fit=crop" },
-      { id: 12, nome: "Suco Natural", descricao: "Laranja, lim茫o ou maracuj谩 (500ml)", preco: 8.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&h=180&fit=crop" },
+      { id: 11, nome: "Refrigerante Lata", descricao: "Coca-Cola, Guaraná, Fanta (escolha nos comentários)", preco: 6.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=300&h=180&fit=crop" },
+      { id: 12, nome: "Suco Natural", descricao: "Laranja, limão ou maracujá (500ml)", preco: 8.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&h=180&fit=crop" },
       { id: 13, nome: "Petit Gateau", descricao: "Bolo de chocolate com casquinha e sorvete de baunilha", preco: 13.90, categoria: "bebidas", imagem: "https://images.unsplash.com/photo-1624353364406-3f6974b1dac5?w=300&h=180&fit=crop" }
     ];
 
     const categorias = [
-      { id: "hamburgueres", nome: "馃崝 Hamb煤rgueres Artesanais", icone: "fa-hamburger" },
-      { id: "especiais", nome: "馃尛 Especiais & Sandu铆ches", icone: "fa-hotdog" },
-      { id: "porcoes", nome: "馃崯 Por莽玫es & Acompanhamentos", icone: "fa-french-fries" },
-      { id: "bebidas", nome: "馃イ Bebidas & Sobremesas", icone: "fa-cocktail" }
+      { id: "hamburgueres", nome: "🍔 Hambúrgueres Artesanais", icone: "fa-hamburger" },
+      { id: "especiais", nome: "🌭 Especiais & Sanduíches", icone: "fa-hotdog" },
+      { id: "porcoes", nome: "🍟 Porções & Acompanhamentos", icone: "fa-french-fries" },
+      { id: "bebidas", nome: "🥤 Bebidas & Sobremesas", icone: "fa-cocktail" }
     ];
 
     let carrinho = [];
@@ -557,7 +557,7 @@
     const MP_BACKEND_URL = "/.netlify/functions/create-preference";
 
 
-    // Renderizar card谩pio
+    // Renderizar cardápio
     function renderCardapio() {
       categoriesContainer.innerHTML = '';
       for (let cat of categorias) {
@@ -579,7 +579,7 @@
           const card = document.createElement('div');
           card.className = 'product-card';
           card.innerHTML = `
-            <img class="product-img" src="${prod.imagem}" alt="${prod.nome}" loading="lazy" onerror="this.src='https://placehold.co/300x180?text=Lanches+Caragu谩'">
+            <img class="product-img" src="${prod.imagem}" alt="${prod.nome}" loading="lazy" onerror="this.src='https://placehold.co/300x180?text=Lanches+Caraguá'">
             <div class="product-info">
               <div class="product-name">${prod.nome}</div>
               <div class="product-desc">${prod.descricao}</div>
@@ -657,7 +657,7 @@
       cartTotalSpan.innerText = `R$ ${total.toFixed(2)}`;
 
       if (carrinho.length === 0) {
-        cartContainer.innerHTML = `<div class="empty-cart-msg">Seu carrinho est谩 vazio 馃崝<br>Adicione deliciosos lanches do card谩pio!</div>`;
+        cartContainer.innerHTML = `<div class="empty-cart-msg">Seu carrinho está vazio 🍔<br>Adicione deliciosos lanches do cardápio!</div>`;
         return;
       }
 
@@ -717,10 +717,10 @@
       }, 4000);
     }
 
-    // FUN脟脙O PAGAMENTO MERCADO PAGO
+    // FUNÇÃO PAGAMENTO MERCADO PAGO
     async function iniciarPagamentoMercadoPago() {
   if (carrinho.length === 0) {
-    mostrarStatusTemp("Seu carrinho est谩 vazio! Adicione itens antes de pagar.", "erro", mpStatusDiv);
+    mostrarStatusTemp("Seu carrinho está vazio! Adicione itens antes de pagar.", "erro", mpStatusDiv);
     return;
   }
   
@@ -728,7 +728,7 @@
   const emailCliente = customerEmailInput.value.trim();
   
   if (!emailCliente || !emailCliente.includes('@')) {
-    mostrarStatusTemp("Informe um e-mail v谩lido para continuar com o pagamento.", "erro", mpStatusDiv);
+    mostrarStatusTemp("Informe um e-mail válido para continuar com o pagamento.", "erro", mpStatusDiv);
     return;
   }
   
@@ -739,14 +739,14 @@
   const paymentData = {
     type: metodoPagamento === 'pix' ? 'pix' : 'card',
     amount: totalPedido,
-    description: `Pedido Lanch茫o Caragu谩 - ${customerNameInput.value}`,
+    description: `Pedido Lanchão Caraguá - ${customerNameInput.value}`,
     payer: {
       email: emailCliente,
       first_name: nomeCliente.split(' ')[0],
       last_name: nomeCliente.split(' ').slice(1).join(' ') || 'Cliente',
       identification: {
         type: 'CPF',
-        number: '12345678909' // Idealmente voc锚 pediria isso ao usu谩rio
+        number: '12345678909' // Idealmente você pediria isso ao usuário
       }
     },
     paymentMethodId: metodoPagamento === 'credit_card' ? 'visa' : 
@@ -754,10 +754,10 @@
                      metodoPagamento === 'ticket' ? 'bolbradesco' : 'pix'
   };
   
-  // Para cart茫o de cr茅dito, voc锚 precisaria de um token (gerado pelo frontend do MP)
+  // Para cartão de crédito, você precisaria de um token (gerado pelo frontend do MP)
   if (metodoPagamento === 'credit_card' || metodoPagamento === 'debit_card') {
-    // Voc锚 precisaria integrar o CardForm do Mercado Pago
-    mostrarStatusTemp("Pagamento com cart茫o requer integra莽茫o adicional com o CardForm do Mercado Pago", "erro", mpStatusDiv);
+    // Você precisaria integrar o CardForm do Mercado Pago
+    mostrarStatusTemp("Pagamento com cartão requer integração adicional com o CardForm do Mercado Pago", "erro", mpStatusDiv);
     return;
   }
   
@@ -777,11 +777,11 @@
         // Exibir QR Code para Pix
         mpStatusDiv.innerHTML = `
           <div style="text-align: center;">
-            <p>鉁� Pagamento gerado com sucesso!</p>
+            <p>✅ Pagamento gerado com sucesso!</p>
             <img src="${data.qr_code_base64}" alt="QR Code Pix" style="max-width: 200px; margin: 10px auto;">
             <p>Escaneie o QR Code para pagar</p>
             <button onclick="copiarPix('${data.qr_code}')" class="mercadopago-btn" style="margin-top: 10px;">
-              Copiar c贸digo Pix
+              Copiar código Pix
             </button>
           </div>
         `;
@@ -791,7 +791,7 @@
         mostrarStatusTemp(`Pagamento ${data.status}: ${data.status_detail}`, "sucesso", mpStatusDiv);
       }
     } else {
-      throw new Error(`Pagamento n茫o aprovado: ${data.status}`);
+      throw new Error(`Pagamento não aprovado: ${data.status}`);
     }
   } catch (error) {
     console.error(error);
@@ -799,20 +799,20 @@
   }
 }
 
-// Fun莽茫o auxiliar para copiar c贸digo Pix
+// Função auxiliar para copiar código Pix
 function copiarPix(codigo) {
   navigator.clipboard.writeText(codigo);
-  mostrarStatusTemp("C贸digo Pix copiado!", "sucesso", mpStatusDiv);
+  mostrarStatusTemp("Código Pix copiado!", "sucesso", mpStatusDiv);
 }
     // ENVIAR PEDIDO WHATSAPP (mantido)
     function enviarPedidoWhatsApp() {
       if (carrinho.length === 0) {
-        mostrarStatusTemp("Seu carrinho est谩 vazio! Adicione itens antes de enviar o pedido.", "erro", paymentStatusDiv);
+        mostrarStatusTemp("Seu carrinho está vazio! Adicione itens antes de enviar o pedido.", "erro", paymentStatusDiv);
         return;
       }
       const endereco = deliveryAddressInput.value.trim();
       if (!endereco) {
-        mostrarStatusTemp("Por favor, informe o endere莽o de entrega em Caraguatatuba.", "erro", paymentStatusDiv);
+        mostrarStatusTemp("Por favor, informe o endereço de entrega em Caraguatatuba.", "erro", paymentStatusDiv);
         return;
       }
       const nomeCliente = customerNameInput.value.trim() || "Cliente";
@@ -822,17 +822,17 @@ function copiarPix(codigo) {
       let itensTexto = "";
       carrinho.forEach(item => {
         const subtotal = item.preco * item.quantidade;
-        itensTexto += `馃崝 *${item.nome}* x${item.quantidade} = R$ ${subtotal.toFixed(2)}\n`;
+        itensTexto += `🍔 *${item.nome}* x${item.quantidade} = R$ ${subtotal.toFixed(2)}\n`;
       });
 
-      const mensagem = `*NOVO PEDIDO - LANCH脙O CARAGU脕* 馃崝馃崯\n\n` +
-                       `馃懁 *Cliente:* ${nomeCliente}\n` +
-                       `馃搷 *Endere莽o de entrega:* ${endereco}\n` +
-                       `馃摝 *Itens do pedido:*\n${itensTexto}\n` +
-                       `馃挵 *Total:* R$ ${totalPedido.toFixed(2)}\n` +
-                       (observacoes ? `馃摑 *Observa莽玫es:* ${observacoes}\n` : '') +
-                       `\n馃敂 *Forma de pagamento:* Confirmar com cliente (Cart茫o, Pix ou Dinheiro na entrega)\n` +
-                       `馃殌 *Entrega em Caraguatatuba* - Aguardo confirma莽茫o!`;
+      const mensagem = `*NOVO PEDIDO - LANCHÃO CARAGUÁ* 🍔🍟\n\n` +
+                       `👤 *Cliente:* ${nomeCliente}\n` +
+                       `📍 *Endereço de entrega:* ${endereco}\n` +
+                       `📦 *Itens do pedido:*\n${itensTexto}\n` +
+                       `💰 *Total:* R$ ${totalPedido.toFixed(2)}\n` +
+                       (observacoes ? `📝 *Observações:* ${observacoes}\n` : '') +
+                       `\n🔔 *Forma de pagamento:* Confirmar com cliente (Cartão, Pix ou Dinheiro na entrega)\n` +
+                       `🚀 *Entrega em Caraguatatuba* - Aguardo confirmação!`;
 
       const msgCodificada = encodeURIComponent(mensagem);
       const linkWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${msgCodificada}`;
@@ -842,7 +842,7 @@ function copiarPix(codigo) {
         // Limpar carrinho opcional
         carrinho = [];
         atualizarCarrinhoUI();
-        mostrarStatusTemp("Pedido enviado! Em breve nossa equipe confirmar谩.", "sucesso", paymentStatusDiv);
+        mostrarStatusTemp("Pedido enviado! Em breve nossa equipe confirmará.", "sucesso", paymentStatusDiv);
       }, 300);
     }
 
